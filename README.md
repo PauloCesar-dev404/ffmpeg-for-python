@@ -4,10 +4,8 @@
 
 
 
-![Versão](https://img.shields.io/badge/version-test-orange)
+![Versão](https://img.shields.io/badge/version-0.3.1-orange)
 ![Licença](https://img.shields.io/badge/license-MIT-orange)
-![Estrelas](https://img.shields.io/github/stars/PauloCesar-dev404/ffmpeg-for-python?style=social)
-![Downloads](https://img.shields.io/pypi/dm/ffmpeg-for-python)
 [![Sponsor](https://img.shields.io/badge/💲Donate-yellow)](https://apoia.se/paulocesar-dev404)
 
 </div>

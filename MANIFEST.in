@@ -1,0 +1,5 @@
+include README_PYPI
+
+include ffmpeg_for_python/ffmpeg-bin/*.*
+
+
