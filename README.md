@@ -4,7 +4,7 @@
 
 
 
-![Versão](https://img.shields.io/badge/version-0.3.1-orange)
+![Versão](https://img.shields.io/badge/version-0.3.3-orange)
 ![Licença](https://img.shields.io/badge/license-MIT-orange)
 [![Sponsor](https://img.shields.io/badge/💲Donate-yellow)](https://apoia.se/paulocesar-dev404)
 

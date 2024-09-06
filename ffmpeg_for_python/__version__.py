@@ -1,4 +1,4 @@
-__version__ = '0.3.1'
+__version__ = '0.3.3'
 __lib_name__ = 'ffmpeg_for_python'
 __autor__ = 'PauloCesar-dev404'
 __repo__ = 'https://github.com/PauloCesar-dev404/ffmpeg-for-python'

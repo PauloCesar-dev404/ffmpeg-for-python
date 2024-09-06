@@ -7,6 +7,7 @@ Wrapper para o binário FFmpeg, permitindo o uso de comandos FFmpeg via Python. 
 
 
 **conversão básica**
+
 ```python
 
 from ffmpeg_for_python import FFmpeg, FFmpegExceptions
@@ -31,7 +32,9 @@ except FFmpegExceptions as e:
         print("Erro ao executar FFmpeg:", e)
 ```
 ---
+
 **remux audio e video**
+
 ```python
 from ffmpeg_for_python import FFmpeg, FFmpegExceptions
 # Cria uma instância do wrapper FFmpeg

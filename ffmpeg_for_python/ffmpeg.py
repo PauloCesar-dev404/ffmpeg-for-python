@@ -124,13 +124,19 @@ class FFmpeg:
 
     @property
     def copy(self) -> 'FFmpeg':
-        """Adiciona o parâmetro '-c copy' ao comando FFm"""
+        """Adiciona o parâmetro '-c copy"""
         self.__command.extend(['-c', 'copy'])
         return self
 
     @property
-    def reset(self) -> 'FFmpeg':
-        """Reseta o comando para reutilização do objeto."""
+    def copy_codecs(self):
+        """para remuxar"""
+        self.__command.extend(['-c:a', 'copy', '-c:v', 'copy'])
+        return self
+
+    def reset_ffmpeg(self) -> 'FFmpeg':
+        """Reseta o comando para reutilização do objeto,isso é necessário em caso de uso em loops,
+        a cada execução execute o reset para ter certeza que estar limpo o cache de comandos"""
         self.__command = [self.__ffmpeg_path]
         return self
 
@@ -174,5 +180,3 @@ class FFmpeg:
             raise NotImplementedError(f"System {system_user} not supported")
 
         return startupinfo_options
-
-
