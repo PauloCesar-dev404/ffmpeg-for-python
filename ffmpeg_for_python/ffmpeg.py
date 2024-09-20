@@ -45,15 +45,14 @@ class FFmpeg:
         """Executa o comando FFmpeg construído.
 
         Args:
-            capture_output (bool): Se verdadeiro, captura a saída padrão e de erro.
+            capture_output (bool): Se verdadeiro, captura a saída e printa no console.
+                                   Se False, a saída é retornada assincronamente em tempo real.
 
-        Returns:
-            Optional[str]: A saída do comando, se capturada. Caso contrário, None.
+        Yields:
+            str: Cada linha da saída filtrada do FFmpeg quando capture_output é False.
         """
 
         configs = self.__oculte_comands_your_system.get('startupinfo')
-        # Armazenar a saída completa, se for necessário capturá-la
-        output = []
 
         # Executa o comando utilizando subprocess
         with subprocess.Popen(
@@ -66,25 +65,32 @@ class FFmpeg:
                 bufsize=1,  # Linha por linha
                 universal_newlines=True  # Garante que novas linhas sejam interpretadas corretamente
         ) as process:
-            # Lê a saída de erro padrão (stderr) em tempo real
-            for linha in process.stderr:
-                time.sleep(0.01)
-                linha_filtrada = wraper_erros(linha)
-                if linha_filtrada:
-                    process.terminate()
-                    raise FFmpegExceptions(message=f'Erro na execução do ffmpeg: "{linha_filtrada}"')
-                else:
-                    if capture_output:
-                        print(linha.strip())
+            try:
+                # Lê a saída de erro padrão (stderr) em tempo real
+                for linha in process.stderr:
+                    time.sleep(0.01)  # Simulação de latência, opcional
 
-            # Espera o processo terminar e captura a saída padrão (stdout)
-            stdout, stderr = process.communicate()
+                    # Filtra a linha de erro padrão
+                    linha_filtrada = wraper_erros(linha)
 
-            if capture_output:
-                output.extend(stdout.splitlines())
-                return '\n'.join(output)
-            else:
-                return stdout.strip() if stdout else None
+                    if linha_filtrada:
+                        # Se houver um erro detectado, o processo é encerrado
+                        process.terminate()
+                        raise FFmpegExceptions(message=f'Erro na execução do ffmpeg: "{linha_filtrada}"')
+                    else:
+                        if capture_output:
+                            # Se `capture_output` estiver ativado, imprime a saída
+                            print(linha.strip())
+                        else:
+                            # Retorna a linha assincronamente quando capture_output é False
+                            yield linha.strip()
+
+                # Aguarda a conclusão do processo
+                process.wait()
+
+            except Exception as e:
+                process.terminate()
+                raise FFmpegExceptions(message=f'Erro no processo FFmpeg: {str(e)}')
 
     def input(self, file_path: str) -> 'FFmpeg':
         """Define o arquivo de entrada para o FFmpeg."""
