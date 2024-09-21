@@ -2,9 +2,9 @@ import os
 import platform
 import subprocess
 import time
-from typing import List, Optional
-from .exeptions import wraper_erros, FFmpegExceptions
+from typing import List
 from .__config__ import Configurate
+from .exeptions import wraper_erros, FFmpegExceptions
 
 parser = Configurate()
 parser.configure()
@@ -129,6 +129,12 @@ class FFmpeg:
         return self
 
     @property
+    def hide_banner(self) -> 'FFmpeg':
+        """oculta o baner do ffmpeg"""
+        self.__command.extend(['-hide_banner'])
+        return self
+
+    @property
     def copy(self) -> 'FFmpeg':
         """Adiciona o parâmetro '-c copy"""
         self.__command.extend(['-c', 'copy'])
@@ -166,23 +172,32 @@ class FFmpeg:
             raise ValueError("Invalid path_type. Use 'file' or 'dir'.")
 
     @property
-    def __oculte_comands_your_system(self):
-        """Identifica o sistema do usuário e cria um dicionário de parâmetros para ocultar saídas de janelas."""
+    def __oculte_comands_your_system(self) -> dict:
+        """Identifica o sistema do usuário e cria um dicionário de parâmetros para ocultar saídas de janelas e do
+        terminal."""
         system_user = platform.system()
         startupinfo_options = {}
 
         if system_user == "Windows":
+            # Configuração específica para ocultar o terminal no Windows
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startupinfo.wShowWindow = subprocess.SW_HIDE
             startupinfo_options['startupinfo'] = startupinfo
 
+            # Definindo stdout, stderr e stdin para DEVNULL para esconder saídas
+            startupinfo_options['stdout'] = subprocess.DEVNULL
+            startupinfo_options['stderr'] = subprocess.DEVNULL
+            startupinfo_options['stdin'] = subprocess.DEVNULL
+
         elif system_user in ["Linux", "Darwin"]:
+            # Para Linux e macOS, ocultar stdout, stderr e stdin
             startupinfo_options['stdout'] = subprocess.DEVNULL
             startupinfo_options['stderr'] = subprocess.DEVNULL
             startupinfo_options['stdin'] = subprocess.DEVNULL
 
         else:
-            raise NotImplementedError(f"System {system_user} not supported")
+            # Exceção para sistemas não suportados
+            raise NotImplementedError(f"O sistema {system_user} não é suportado para ocultação de comandos.")
 
         return startupinfo_options
