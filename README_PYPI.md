@@ -27,7 +27,9 @@ output_video = 'output_video.mkv'
 
     # Executa o comando FFmpeg e exibe a saída
 try:
-        ffmpeg.run(capture_output=True)
+        lines = ffmpeg.run(capture_output=True)
+        for l in lines:
+            print(l)
 except FFmpegExceptions as e:
         print("Erro ao executar FFmpeg:", e)
 ```
@@ -54,7 +56,9 @@ output_video = 'output_video.mp4'
 
 # Executa o comando FFmpeg e exibe a saída
 try:
-        ffmpeg.run(capture_output=True)
+        lines = ffmpeg.run(capture_output=True)
+        for l in lines:
+            print(l)
 except FFmpegExceptions as e:
         print("Erro ao executar FFmpeg:", e)
 ```

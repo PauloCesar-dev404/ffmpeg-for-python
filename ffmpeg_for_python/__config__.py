@@ -1,3 +1,4 @@
+import site
 import struct
 import sys
 import os
@@ -9,9 +10,7 @@ from .exeptions import *
 from .__utils import URL_PLATAFOMR,system
 
 lib_name = 'ffmpeg_for_python'
-URL_BASE_REPO = "https://raw.githubusercontent.com/PauloCesar-dev404/binarios/main/"
-
-
+URL_BASE_REPO = 'https://github.com/PauloCesar-dev404/binarios/raw/refs/heads/main/'
 
 
 class Configurate:
@@ -30,21 +29,17 @@ class Configurate:
 
     @property
     def is_venv(self):
-        """Verifica se o script está sendo executado em um ambiente virtual e retorna o diretório de bibliotecas globais.
-     Se estiver em um ambiente virtual, retorna o diretório de bibliotecas do ambiente virtual. Caso contrário, retorna
-     o diretório de bibliotecas globais do Python global."""
-        if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
-            # Retorna o diretório de bibliotecas do ambiente virtual
-            return os.path.join(os.path.dirname(os.path.abspath(sys.executable)), 'Lib',
-                                'site-packages') if os.name == 'nt' else os.path.join \
-                (os.path.dirname(os.path.abspath(sys.executable)), 'lib',
-                 'python{0.major}.{0.minor}'.format(sys.version_info), 'site-packages')
-        else:
-            # Retorna o diretório de bibliotecas globais do Python global
-            return os.path.join(os.path.dirname(os.path.abspath(sys.executable)), 'Lib',
-                                'site-packages') if os.name == 'nt' else os.path.join \
-                (os.path.dirname(os.path.abspath(sys.executable)), 'lib',
-                 'python{0.major}.{0.minor}'.format(sys.version_info), 'site-packages')
+        """
+            Retorna o diretório 'site-packages' ativo (seja venv ou global).
+            """
+        try:
+            # getsitepackages retorna uma lista, pegamos o primeiro ou o apropriado
+            packages = site.getsitepackages()
+            return packages[0]  # Geralmente o primeiro é o que queremos
+        except AttributeError:
+            # Fallback para ambientes virtuais muito antigos ou distros específicas
+            import distutils.sysconfig
+            return sys.modules[distutils.sysconfig.get_python_lib()]
 
     def configure(self):
         """Configura as variáveis de ambiente com base no sistema operacional."""
@@ -100,7 +95,6 @@ class Configurate:
                         f"\rBaixando Binários do ffmpeg: {percent_done:.2f}% | Velocidade: {speed_kbps:.2f} KB/s | "
                         f"Tempo decorrido: {int(elapsed_time)}s")
                     sys.stdout.flush()
-                sys.stdout.write("\nDownload completo.\n")
                 sys.stdout.flush()
 
         except requests.RequestException as e:
