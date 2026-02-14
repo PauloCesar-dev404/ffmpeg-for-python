@@ -13,13 +13,17 @@ def get_processor_info():
     elif system in ["Linux", "Darwin"]:  # Darwin é o nome do sistema para macOS
         try:
             if system == "Linux":
-                # Obtém informações detalhadas do processador no Linux
-                with open("/proc/cpuinfo") as f:
-                    cpuinfo = f.read()
-                    if "model name" in cpuinfo:
-                        processor = cpuinfo.split("model name")[1].split(":")[1].split("\n")[0].strip()
-                    else:
-                        processor = "Unknown"
+                # Verifica se estamos no Termux
+                if os.path.exists("/data/data/com.termux/files/usr/bin"):
+                    processor = "Termux"
+                else:
+                    # Obtém informações detalhadas do processador no Linux
+                    with open("/proc/cpuinfo") as f:
+                        cpuinfo = f.read()
+                        if "model name" in cpuinfo:
+                            processor = cpuinfo.split("model name")[1].split(":")[1].split("\n")[0].strip()
+                        else:
+                            processor = "Unknown"
             elif system == "Darwin":
                 # Obtém informações detalhadas do processador no macOS
                 processor = os.popen("sysctl -n machdep.cpu.brand_string").read().strip()
@@ -32,8 +36,8 @@ def get_processor_info():
 
 
 # Processa a informação do processador e limpa a string
-data = (get_processor_info().replace('Architecture:', '').replace('System:', '').
-        replace('Processor:', '').strip().split())
+data = (
+    get_processor_info().replace('Architecture:', '').replace('System:', '').replace('Processor:', '').strip().split())
 
 # Remove entradas vazias e limpa espaços em branco
 cleaned_data = [item.strip() for item in data if item.strip()]
@@ -45,25 +49,34 @@ if len(cleaned_data) >= 2:
     processor = ' '.join(cleaned_data[2:])  # Junta o restante como o processador
 
     URL_BASE_REPO = "https://raw.githubusercontent.com/PauloCesar-dev404/binarios/main/"
+
     # Mapeamento para Linux
     linux_mapping = {
         "x86_64": "amd64",
         "i686": "i686",
         "arm64": "arm64",
         "armhf": "armhf",
-        "armel": "armel"
+        "armel": "armel",
+        "aarch64": "arm64"  # Termux aarch64
     }
+
     # Formata a URL com base no sistema e arquitetura
-    if system == "Linux" and ('intel' in processor.lower() or 'amd' in processor.lower()):
-        url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('x86_64')}.zip"
-    elif system == "Linux" and 'i686' in architecture.lower():
-        url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('i686')}.zip"
-    elif system == "Linux" and 'arm64' in architecture.lower():
-        url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('arm64')}.zip"
-    elif system == "Linux" and 'armhf' in architecture.lower():
-        url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('armhf')}.zip"
-    elif system == "Linux" and 'armel' in architecture.lower():
-        url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('armel')}.zip"
+    if system == "Linux":
+        if 'termux' in processor.lower():
+            # Suporte para TermuX
+                url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-termux-arm64.zip"
+        elif 'intel' in processor.lower() or 'amd' in processor.lower():
+            url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('x86_64')}.zip"
+        elif 'i686' in architecture.lower():
+            url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('i686')}.zip"
+        elif 'arm64' in architecture.lower():
+            url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('arm64')}.zip"
+        elif 'armhf' in architecture.lower():
+            url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('armhf')}.zip"
+        elif 'armel' in architecture.lower():
+            url = f"{URL_BASE_REPO}linux/ffmpeg-7.0.2-{linux_mapping.get('armel')}.zip"
+        else:
+            url = f"Unsupported Linux architecture"
     elif system == "Windows" and architecture == '64bit':
         url = f"{URL_BASE_REPO}windows/win-ffmpeg-7.0.2-full-amd64-intel64.zip"
     else:
@@ -75,4 +88,4 @@ else:
     raise DeprecationWarning("Não foi possível obter seu sistema ....consulte o desenvolvedor!")
 
 if __name__ == '__main__':
-    raise RuntimeError("este é uma função interna!")
+    raise RuntimeError("Este é uma função interna!")
